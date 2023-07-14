@@ -69,4 +69,4 @@ You can create a production build by running `npm run build`. This command creat
 
 If you add more API routes to this application, you will need to update the Swagger specification file. Run `npm run swagger-spec` to update it.
 
-![Swagger View](https://github.com/evgomes/node-notes-api/main/images/swagger-view.png)
+![Swagger View](https://raw.githubusercontent.com/evgomes/node-notes-api/main/images/swagger-view.png)
