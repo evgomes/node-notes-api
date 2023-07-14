@@ -1,0 +1,645 @@
+{
+	"components": {
+		"examples": {},
+		"headers": {},
+		"parameters": {},
+		"requestBodies": {},
+		"responses": {},
+		"schemas": {
+			"TokenResource": {
+				"properties": {
+					"success": {
+						"type": "boolean"
+					},
+					"token": {
+						"type": "string"
+					},
+					"message": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"success"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"LoginResource": {
+				"properties": {
+					"email": {
+						"type": "string"
+					},
+					"password": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"email",
+					"password"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"NoteResource": {
+				"properties": {
+					"id": {
+						"type": "number",
+						"format": "double"
+					},
+					"userId": {
+						"type": "number",
+						"format": "double"
+					},
+					"text": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"id",
+					"userId",
+					"text"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ErrorResource": {
+				"properties": {
+					"success": {
+						"type": "boolean"
+					},
+					"messages": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"success",
+					"messages"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"SaveNoteResource": {
+				"properties": {
+					"text": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"text"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"QueryResultResource_NoteResource_": {
+				"properties": {
+					"items": {
+						"items": {
+							"$ref": "#/components/schemas/NoteResource"
+						},
+						"type": "array"
+					},
+					"totalItems": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"items",
+					"totalItems"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"NotesQueryResource": {
+				"properties": {
+					"page": {
+						"type": "number",
+						"format": "double"
+					},
+					"itemsPerPage": {
+						"type": "number",
+						"format": "double"
+					},
+					"text": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"page",
+					"itemsPerPage"
+				],
+				"type": "object",
+				"additionalProperties": false
+			}
+		},
+		"securitySchemes": {
+			"Bearer": {
+				"type": "apiKey",
+				"name": "Authorization",
+				"scheme": "bearer",
+				"in": "header"
+			}
+		}
+	},
+	"info": {
+		"title": "sticky-notes-api",
+		"version": "1.0.0",
+		"description": "RESTful API for the Sticky Notes App",
+		"license": {
+			"name": "MIT"
+		},
+		"contact": {
+			"name": "Evandro Gomes"
+		}
+	},
+	"openapi": "3.0.0",
+	"paths": {
+		"/api/login": {
+			"post": {
+				"operationId": "Authenticate",
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/TokenResource"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"email": "example@email.com",
+											"password": "123456"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/TokenResource"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"success": false,
+											"message": "Invalid login or  password."
+										}
+									}
+								}
+							}
+						}
+					}
+				},
+				"description": "Authenticates an user using an email and password.",
+				"tags": [
+					"Auth"
+				],
+				"security": [
+					{
+						"Bearer": []
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"description": "Payload containing the user's email and password.",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/LoginResource",
+								"description": "Payload containing the user's email and password."
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/notes": {
+			"post": {
+				"operationId": "Create",
+				"responses": {
+					"201": {
+						"description": "Created",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/NoteResource"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResource"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"success": false,
+											"messages": [
+												"Invalid data."
+											]
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResource"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"success": false,
+											"messages": [
+												"Access denied."
+											]
+										}
+									}
+								}
+							}
+						}
+					}
+				},
+				"description": "Creates a sticky note using a text provided in the request body.",
+				"tags": [
+					"Notes"
+				],
+				"security": [
+					{
+						"Bearer": []
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"description": "resource containing the note text.",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SaveNoteResource",
+								"description": "resource containing the note text."
+							}
+						}
+					}
+				}
+			},
+			"get": {
+				"operationId": "List",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/QueryResultResource_NoteResource_"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResource"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"success": false,
+											"messages": [
+												"Access denied."
+											]
+										}
+									}
+								}
+							}
+						}
+					}
+				},
+				"description": "Returns all notes that match query filters.",
+				"tags": [
+					"Notes"
+				],
+				"security": [
+					{
+						"Bearer": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "page",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "itemsPerPage",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "text",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/api/notes/{id}": {
+			"patch": {
+				"operationId": "Patch",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"anyOf": [
+										{
+											"$ref": "#/components/schemas/NoteResource"
+										},
+										{
+											"$ref": "#/components/schemas/ErrorResource"
+										}
+									]
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResource"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"success": false,
+											"messages": [
+												"Invalid data."
+											]
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResource"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"success": false,
+											"messages": [
+												"Access denied."
+											]
+										}
+									}
+								}
+							}
+						}
+					}
+				},
+				"description": "Patches a sticky note by updating its text.",
+				"tags": [
+					"Notes"
+				],
+				"security": [
+					{
+						"Bearer": []
+					}
+				],
+				"parameters": [
+					{
+						"description": "note ID.",
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				],
+				"requestBody": {
+					"description": "resource containing the note text.",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SaveNoteResource",
+								"description": "resource containing the note text."
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "Delete",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"anyOf": [
+										{
+											"$ref": "#/components/schemas/NoteResource"
+										},
+										{
+											"$ref": "#/components/schemas/ErrorResource"
+										}
+									]
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResource"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"success": false,
+											"messages": [
+												"Access denied."
+											]
+										}
+									}
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResource"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"success": false,
+											"messages": [
+												"The note was not found."
+											]
+										}
+									}
+								}
+							}
+						}
+					}
+				},
+				"description": "Deletes a sticky note by ID.",
+				"tags": [
+					"Notes"
+				],
+				"security": [
+					{
+						"Bearer": []
+					}
+				],
+				"parameters": [
+					{
+						"description": "note ID.",
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			},
+			"get": {
+				"operationId": "GetById",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"anyOf": [
+										{
+											"$ref": "#/components/schemas/NoteResource"
+										},
+										{
+											"$ref": "#/components/schemas/ErrorResource"
+										}
+									]
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResource"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"success": false,
+											"messages": [
+												"Access denied."
+											]
+										}
+									}
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResource"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"success": false,
+											"messages": [
+												"The note was not found."
+											]
+										}
+									}
+								}
+							}
+						}
+					}
+				},
+				"description": "Retrieves a sticky note by ID.",
+				"tags": [
+					"Notes"
+				],
+				"security": [
+					{
+						"Bearer": []
+					}
+				],
+				"parameters": [
+					{
+						"description": "note ID.",
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		}
+	},
+	"servers": [
+		{
+			"url": "/"
+		}
+	]
+}
